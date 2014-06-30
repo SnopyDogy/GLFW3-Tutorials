@@ -108,7 +108,7 @@ int Init()
 	printf("Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
 	// create our second window:
-	WindowHandle hSecondaryWindow = CreateWindow(c_iDefaultScreenWidth, c_iDefaultScreenHeight, "second", nullptr, hPrimaryWindow);
+	CreateWindow(c_iDefaultScreenWidth, c_iDefaultScreenHeight, "second", nullptr, hPrimaryWindow);
 	
 	MakeContextCurrent(hPrimaryWindow);
 
