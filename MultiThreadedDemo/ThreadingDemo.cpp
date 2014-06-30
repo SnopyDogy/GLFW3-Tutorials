@@ -10,10 +10,8 @@
 #include <thread>
 #include <future>
 #include <atomic>
-//#pragma warning(disable: C4201)		// disable a whole bunch of unnamed struct/union warnings.
 #include "glm\glm.hpp"
 #include "glm\ext.hpp"
-//#pragma warning(default: C4201)
 #include <iostream>
 
 // info: http://www.baptiste-wicht.com/2012/04/c11-concurrency-tutorial-advanced-locking-and-condition-variables/
@@ -73,9 +71,22 @@ int main()
 	if (iReturnCode != EC_NO_ERROR)
 		return iReturnCode;
 
+	// use this to simulate 3ms of work per window.
 	g_bDoWork = true;
+
+	/* Use the following loop to have this demo run like the
+	original Multi-Window tutorial code. its here for comparison. */
 	//iReturnCode = MainLoop();
+
+	/* My initial naive attempt at multithreading on a per window basis.
+	This loop will try to render from both threads simultaneously.
+	WARNING: RUN AT YOUR OWN RISK. I have had this loop crash on several occasions,
+	it is not stable and is only here as an example on how not to do it. */
 	//iReturnCode = MainLoopBAD();
+
+	/* This loop is a working/stable example of how to render from multipul threads. 
+	Notice that this does NOT render from both threads at the same time. 
+	*/
 	iReturnCode = MainLoopTHREADED();
 
 
@@ -677,7 +688,7 @@ void GLFWErrorCallback(int a_iError, const char* a_szDiscription)
 }
 
 
-void APIENTRY GLErrorCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, void* userParam)
+void APIENTRY GLErrorCallback(GLenum /* source */, GLenum type, GLuint id, GLenum severity, GLsizei /* length */, const GLchar* message, void* /* userParam */)
 {
 	std::cout << "---------------------opengl-callback-start------------" << std::endl;
 	std::cout << "Message: " << message << std::endl;
