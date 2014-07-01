@@ -113,7 +113,7 @@ int Init()
 	// create our first window:
 	g_hPrimaryWindow = CreateWindow(c_iDefaultScreenWidth, c_iDefaultScreenHeight, c_szDefaultPrimaryWindowTitle, nullptr, nullptr);
 	
-	if (g_hPrimaryWindow < 0)
+	if (g_hPrimaryWindow == nullptr)
 	{
 		glfwTerminate();
 		return EC_GLFW_FIRST_WINDOW_CREATION_FAIL;
