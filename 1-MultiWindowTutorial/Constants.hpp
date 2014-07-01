@@ -1,13 +1,13 @@
 ////////////////////////////////////////////////////////////
-/// @file		PulsarTechDemoConfig.h
-/// @details	Header file containing Config info for the Pulsar Tech Demo!
+/// @file		Constants.h
+/// @details	Header file containing Constants for the multiwindow Tutorial.
 /// @author		Greg Nott
 /// @version	1.0 - Initial Version
-/// @date		4/05/13
+/// @date		1/07/14
 ////////////////////////////////////////////////////////////
 
-#ifndef _PULSARTECHDEMOCONFIG_H_
-#define _PULSARTECHDEMOCONFIG_H_
+#ifndef _CONSTANTS_H_
+#define _CONSTANTS_H_
 
 
 enum ExitCodes
@@ -21,7 +21,7 @@ enum ExitCodes
 const int c_iDefaultScreenWidth = 1280;
 const int c_iDefaultScreenHeight = 720;
 
-const char *c_szDefaultPrimaryWindowTitle = "Pulsar Tech Demo - Primary Window";
+const char *c_szDefaultPrimaryWindowTitle = "Multi Window Demo - Primary Window";
 
 const char *c_szVertexShader = "#version 330\n"
 	"in vec4 Position;\n"
@@ -51,4 +51,4 @@ const char *c_szPixelShader = "#version 330\n"
 	"}\n"
 	"\n";
 
-#endif // _PULSARTECHDEMOCONFIG_H_
+#endif // _CONSTANTS_H_
