@@ -551,6 +551,11 @@ WindowHandle CreateWindow(int a_iWidth, int a_iHeight, const std::string& a_szTi
 	newWindow->m_uiWidth = a_iWidth;
 	newWindow->m_uiHeight = a_iHeight;
 
+	// if compiling in debug ask for debug context:
+#ifdef _DEBUG
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLU_TRUE);
+#endif
+
 	std::cout << "Creating window called " << a_szTitle.c_str() << " with ID " << newWindow->m_uiID << std::endl;
 
 	// Create Window:
@@ -715,7 +720,7 @@ void APIENTRY GLErrorCallback(GLenum /* source */, GLenum type, GLuint id, GLenu
         break;
     }
 
-	std::cout << "ID: " << id << ", Severity : ";
+	std::cout << "ID: " << id << ", Severity: ";
     switch (severity)
         {
     case GL_DEBUG_SEVERITY_LOW:
