@@ -1,13 +1,13 @@
 ////////////////////////////////////////////////////////////
-/// @file		Constants.h
+/// @file		Constants.hpp
 /// @details	Header file containing Constants for the multiwindow Tutorial.
 /// @author		Greg Nott
 /// @version	1.0 - Initial Version
 /// @date		1/07/14
 ////////////////////////////////////////////////////////////
 
-#ifndef _CONSTANTS_H_
-#define _CONSTANTS_H_
+#ifndef _CONSTANTS_HPP_
+#define _CONSTANTS_HPP_
 
 
 enum ExitCodes
@@ -51,4 +51,4 @@ const char *c_szPixelShader = "#version 330\n"
 	"}\n"
 	"\n";
 
-#endif // _CONSTANTS_H_
+#endif // _CONSTANTS_HPP_
