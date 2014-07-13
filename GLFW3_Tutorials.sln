@@ -1,9 +1,27 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.30626.0
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "1-MultiWindowTutorial", "1-MultiWindowTutorial\1-MultiWindowTutorial.vcxproj", "{A59F1314-B532-436A-B52B-42B84EEB8B83}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThreadingDemo", "MultiThreadedDemo\MultiThreadedDemo.vcxproj", "{A299613E-3BD3-4A73-A416-845697D0D99E}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A59F1314-B532-436A-B52B-42B84EEB8B83}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A59F1314-B532-436A-B52B-42B84EEB8B83}.Debug|Win32.Build.0 = Debug|Win32
+		{A59F1314-B532-436A-B52B-42B84EEB8B83}.Release|Win32.ActiveCfg = Release|Win32
+		{A59F1314-B532-436A-B52B-42B84EEB8B83}.Release|Win32.Build.0 = Release|Win32
+		{A299613E-3BD3-4A73-A416-845697D0D99E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A299613E-3BD3-4A73-A416-845697D0D99E}.Debug|Win32.Build.0 = Debug|Win32
+		{A299613E-3BD3-4A73-A416-845697D0D99E}.Release|Win32.ActiveCfg = Release|Win32
+		{A299613E-3BD3-4A73-A416-845697D0D99E}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
