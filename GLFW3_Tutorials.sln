@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30626.0
+# Visual Studio Express 2013 for Windows Desktop
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "1-MultiWindowTutorial", "1-MultiWindowTutorial\1-MultiWindowTutorial.vcxproj", "{A59F1314-B532-436A-B52B-42B84EEB8B83}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThreadingDemo", "MultiThreadedDemo\MultiThreadedDemo.vcxproj", "{A299613E-3BD3-4A73-A416-845697D0D99E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "2-WindowHandling", "2-WindowHandling\2-WindowHandling.vcxproj", "{463CDE16-F1CF-4660-A932-90E4615E69F6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "2-WindowHandling-Tests", "2-WindowHandling\2-WindowHandling-Tests.vcxproj", "{EA5D84C0-FC70-4160-8691-D498B5418B18}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{463CDE16-F1CF-4660-A932-90E4615E69F6}.Debug|Win32.Build.0 = Debug|Win32
 		{463CDE16-F1CF-4660-A932-90E4615E69F6}.Release|Win32.ActiveCfg = Release|Win32
 		{463CDE16-F1CF-4660-A932-90E4615E69F6}.Release|Win32.Build.0 = Release|Win32
+		{EA5D84C0-FC70-4160-8691-D498B5418B18}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EA5D84C0-FC70-4160-8691-D498B5418B18}.Debug|Win32.Build.0 = Debug|Win32
+		{EA5D84C0-FC70-4160-8691-D498B5418B18}.Release|Win32.ActiveCfg = Release|Win32
+		{EA5D84C0-FC70-4160-8691-D498B5418B18}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
