@@ -17,7 +17,9 @@
 
 # Exclude Build Dirs
 [Dd]ebug
+[Dd]ebug_Tests
 [Rr]elease
+[Rr]elease_Tests
 
 # =========================
 # Operating System Files
