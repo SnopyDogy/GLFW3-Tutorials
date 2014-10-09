@@ -11,9 +11,6 @@
 #include "glm\glm.hpp"  // Core GLM stuff, same as GLSL math.
 #include "glm\ext.hpp"	// GLM extensions.
 
-#include <chrono>
-#include <thread>
-
 //////////////////////// global Vars //////////////////////////////
 
 std::map<int, unsigned int>	g_mVAOs;
@@ -39,35 +36,6 @@ int ShutDown();
 void GLFWErrorCallback(int a_iError, const char* a_szDiscription);
 bool ShouldClose();
 
-//Window TestWindow;
-
-void Test()
-{
-	Window TestWindow = Window(1280, 720, "test");
-	
-	auto thread = std::thread([](Window* win)
-	{
-		Window TestWindow = Window(1280, 720, "test");
-
-//		win->MakeCurrent();
-		std::chrono::milliseconds dura(2000);
-		std::this_thread::sleep_for(dura);
-		TestWindow.MakeCurrent();
-		std::this_thread::sleep_for(dura);
-
-
-		//Window::MakeContextCurrent(nullptr);
-
-	}, &TestWindow);
-
-	thread.join();
-
-	//window->MakeCurrent();
-
-	//delete window;
-}
-
-
 //////////////////////// Function Definitions //////////////////////////////
 int main()
 {
@@ -76,8 +44,6 @@ int main()
 	iReturnCode = Init();
 	if (iReturnCode != EC_NO_ERROR)
 		return iReturnCode;
-
-	//Test();
 
 	iReturnCode = MainLoop();
 	if (iReturnCode != EC_NO_ERROR)
