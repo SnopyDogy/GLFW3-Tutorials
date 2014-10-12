@@ -2,8 +2,8 @@
 /// @file		Window.h
 /// @details	Header file containing the Window Class.
 /// @author		Greg Nott
-/// @version	1.0 - Initial Version
-/// @date		14/07/14
+/// @version	1.1 - Added exceptions
+/// @date		9/10/14
 ////////////////////////////////////////////////////////////
 
 #ifndef _WINDOW_H_
@@ -12,6 +12,8 @@
 #include <vector>
 #include <utility>						// for std::pair
 #include <thread>
+#include <stdexcept>
+
 #include "glm\glm.hpp"
 
 // Forward declarations:
@@ -110,6 +112,8 @@ private:
 	void SetGLFWWindowHints(WindowHints* a_pWindowHints);						///< Sets GLFW window hints.
 	void SetupCallbacks();														///< Sets up GLFW and OpenGL callbacks for the window.
 	void Destory();																///< Destorys the window completely, used in destructor and copy constructor (if neccesary)
+	bool CalledOnMainThread();													///< Convenience function used internally to check that a method was called on the Main Thread. 
+	bool CalledOnBoundThread();													///< Convenience function used internally to check that a method has been called on the same thread the context is bound too.
 };
 
 
@@ -130,6 +134,60 @@ inline bool Window::IsValid() const
 *  This needs to be defined for GLEW MX to work, along with the GLEW_MX define in the perprocessor!
 */
 GLEWContextStruct* glewGetContext();
+
+
+
+//////////////////////// Exceptions thrown by the window class //////////////////////////////
+
+
+/*! @brief Exception for misuse of the window class. 
+*
+*  This exception is thrown by the window class whenever the user
+*  tries to do something on a thread other then the programs main (first)
+*  thread which GLFW requires be done on the main thread only. See the GLFW 
+*  window handling documentation for more details.
+*/
+class NotCalledOnMainThreadException : public std::runtime_error
+{
+public:
+	NotCalledOnMainThreadException(std::thread::id a_oCallingThreadID, std::thread::id a_oMainThreadID)
+		: runtime_error("Method was not called on the main thread as required by GFLW.")
+		, m_oCallingThreadID(a_oCallingThreadID)
+		, m_oMainThreadID(a_oMainThreadID)
+	{}
+
+	std::thread::id CallingThreadID() const { return m_oCallingThreadID;	}
+	std::thread::id MainThreadID() const	{ return m_oMainThreadID;		}
+
+private:
+	std::thread::id m_oCallingThreadID;
+	std::thread::id m_oMainThreadID;
+};
+
+
+/*! @brief Exception for misuse of the window class.
+*
+*  This exception is thrown by the window class whenever the user
+*  tries to do something (typiclay SetActive()) when you have 
+*  already bound the Window/context on a DIFFERENT thread.
+*  See the GLFW window handling documentation for more details.
+*/
+class NotCalledOnBoundThreadException : public std::runtime_error
+{
+public:
+	NotCalledOnBoundThreadException(std::thread::id a_oCallingThreadID, std::thread::id a_oBoundThreadID)
+		: runtime_error("Method was not called on the currently Bound thread as required by GFLW/OpenGL.")
+		, m_oCallingThreadID(a_oCallingThreadID)
+		, m_oBoundThreadID(a_oBoundThreadID)
+	{}
+
+	std::thread::id CallingThreadID() const { return m_oCallingThreadID;	}
+	std::thread::id BoundThreadID() const	{ return m_oBoundThreadID;		}
+
+private:
+	std::thread::id m_oCallingThreadID;
+	std::thread::id m_oBoundThreadID;
+};
 
 
 #endif // _WINDOW_H_

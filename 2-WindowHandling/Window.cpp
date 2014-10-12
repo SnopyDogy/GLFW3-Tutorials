@@ -11,7 +11,11 @@
 #include <iostream>
 #endif
 
-int Window::m_iWindowCounter = 0;		// the first window will have an ID of 0.
+// This will get the id of the apps main thread on program startuip (before main exacutes).
+std::thread::id g_oMainThread = std::this_thread::get_id();
+
+// Setup Static Window class members:
+int Window::m_iWindowCounter = 0;			// the first window will have an ID of 0.
 std::vector<Window*> Window::m_aWindows;
 std::thread::id	Window::m_oMainThread;
 
@@ -57,13 +61,13 @@ Window::Window(int a_iWidth, int a_iHeight, const std::string& a_szTitle, GLFWmo
 	, m_szTitle(a_szTitle)
 {
 	// if this is the first window created we need to save our "main" thread id:
-	if (m_oMainThread == std::thread::id())
+	if (CalledOnMainThread() == false)
 	{
-		// then this must be the first window created, as we can only create windows on the main thread
-		// we can safely retrive the main thread ID in the constructor (tho this assumes the user does the right thing)
+		// We need to check that we are on the main thread... 
+		// just in case the user does the wrong thing...
 		// For detials of which GLFW functions can only occure on the main thread see: 
 		// http://www.glfw.org/docs/latest/group__window.html
-		m_oMainThread = std::this_thread::get_id();
+		throw NotCalledOnMainThreadException(std::this_thread::get_id(), m_oMainThread);
 	}
 
 	// save current active context info so we can restore it later!
@@ -134,6 +138,11 @@ Window::Window(Window&& a_rOther)
 	, m_iWidth(0)
 	, m_iHeight(0)
 {
+	// safty check, we can only call this on the Main Thread
+	// due to the fact that we call glfwSetWindowUserPointer()
+	if (CalledOnMainThread() == false)
+		throw NotCalledOnMainThreadException(std::this_thread::get_id(), m_oMainThread);
+
 	// now copy data for the rvalue:
 	m_pWindow = a_rOther.m_pWindow;
 	m_pGLEWContext = a_rOther.m_pGLEWContext;
@@ -164,6 +173,11 @@ Window::Window(Window&& a_rOther)
 
 Window& Window::operator=(Window&& a_rOther)
 {
+	// safty check, we can only call this on the Main Thread
+	// due to the fact that we call glfwSetWindowUserPointer()
+	if (CalledOnMainThread() == false)
+		throw NotCalledOnMainThreadException(std::this_thread::get_id(), m_oMainThread);
+
 	// first check to see if this (i.e. the left hand side/lvalue) 
 	// is valid:
 	if (IsValid())
@@ -214,21 +228,26 @@ Window::~Window()
 	Destory();
 }
 
-
+// Note that we use asserts in this function instead of the
+// exceptions used elsewhere because it is called in the destructor (see above).
+// And if we incorrectly call glfwDestroyWindow() then our app is going to crash anyway.
+// At lease by calling Assert we controll where it happens.
 void Window::Destory()
 {
 	// if we are destorying a valid window then we need a whole bunch of safety checks:
 	if (IsValid())
 	{
 		// note that because we can only call glfwDestoryWindow() on the
-		// "main" thread we should first assert that this is the case.
+		// "main" thread we should first check that this is the case.
 		// see: http://www.glfw.org/docs/latest/group__window.html#gacdf43e51376051d2c091662e9fe3d7b2 for detials.
-		auto oCallingThread = std::this_thread::get_id();
-		assert(m_oMainThread == oCallingThread);
+		// we will use an assert here as we cannot through from the destructor.
+		assert(CalledOnMainThread()); 
 
-		// check to see if we are current on this thread, 
+		// check to see if we are bound on this thread, 
 		// if so detach us so we can safly delete ourself.
 		// Note that this is not foolproof as it is possible for us to be current on a different thread.
+		// note that even though glfw will detach a context bound on the main threads, 
+		// we still need to call this to clean up our own state.
 		auto pCurrentContext = Window::CurrentContext();
 		if (pCurrentContext != nullptr && pCurrentContext == this)
 		{
@@ -240,18 +259,19 @@ void Window::Destory()
 		// the context can safley be bound on the main thread, but it cannot be bound on any other thread.
 		// so we better make sure that is the case:
 #ifdef _DEBUG
-		// print nicwe helpt message if compiling in debug:
-		if (m_oBoundThread != std::thread::id() && m_oBoundThread != oCallingThread)			// note that the default ctor for thread::id will have a value that specifes no thread.
+		// print nice help message if compiling in debug:
+		if (CalledOnBoundThread() == false)			// note that the default ctor for thread::id will have a value that specifes no thread.
 		{
 			// if it turns out we are on a different thread:
 			std::cout << "WARNING: You are destorying a window on a different thread then the one on which it is bound." << std::endl;
 			std::cout << "Window Title: " << m_szTitle << std::endl;
 			std::cout << "Bound Thread: " << m_oBoundThread << std::endl;
-			std::cout << "Calling Thread: " << oCallingThread << std::endl;
+			std::cout << "Calling Thread: " << std::this_thread::get_id() << std::endl;
 		}
 #endif
+		
 		// then asset that we are not bound (yes, i know this repeats the above, but the above was to give us a nice helper message).
-		assert(m_oBoundThread == oCallingThread || m_oBoundThread == std::thread::id());
+		assert(CalledOnBoundThread());
 	}
 
 	// now we can finally destruct the window (and we know it is safe to do so :P)
@@ -280,18 +300,21 @@ void Window::MakeContextCurrent(Window* a_pWindowHandle)
 	// first we must do a safty check to make sure we are not bound on a differnt thread:
 	// NOTE: std::thread::id's ctor will by default creats an
 	// ID which identifies no specific thread, so the below
-	// if will be true if we are bound to any valid thread.
+	// will be true if we are bound to any valid thread.
 	if (a_pWindowHandle != nullptr											// moot point if the its a null context :P
-		&& a_pWindowHandle->m_oBoundThread != std::thread::id()
-		&& a_pWindowHandle->m_oBoundThread != std::this_thread::get_id())
+		&& a_pWindowHandle->CalledOnBoundThread() == false)
 	{
+		auto oCallingThread = std::this_thread::get_id();
+
 #ifdef _DEBUG
 		std::cout << "ERROR: Cannot make context for window " << a_pWindowHandle->m_szTitle
-			<< " current on thread ID: " << std::this_thread::get_id()
+			<< " current on thread ID: " << oCallingThread
 			<< ", as it is alread bound on thead ID: " << a_pWindowHandle->m_oBoundThread << std::endl;
 #endif
 
-		return; // oopps we can't make this context current.
+		throw NotCalledOnBoundThreadException(oCallingThread, a_pWindowHandle->m_oBoundThread);
+
+		//return; // oopps we can't make this context current.
 	}
 
 	// set any existing contexts bound thread id to none:
@@ -315,7 +338,8 @@ void Window::MakeContextCurrent(Window* a_pWindowHandle)
 void Window::MakeCurrent()
 {
 	// first we must do a safty check to make sure we are not bound on a differnt thread:
-	if (m_oBoundThread != std::thread::id() && m_oBoundThread != std::this_thread::get_id())
+	auto oCallingThread = std::this_thread::get_id();
+	if (CalledOnBoundThread() == false)
 	{
 #ifdef _DEBUG
 		std::cout << "Cannot make context for window " << m_szTitle
@@ -323,7 +347,9 @@ void Window::MakeCurrent()
 			<< ", as it is alread bound on thead ID: " << m_oBoundThread << std::endl;
 #endif
 
-		return; // oopps we can't make this context current.
+		throw NotCalledOnBoundThreadException(oCallingThread, m_oBoundThread);
+
+		//return; // oopps we can't make this context current.
 	}
 
 	m_oBoundThread = std::this_thread::get_id();
@@ -516,3 +542,26 @@ void APIENTRY GLErrorCallback(GLenum source, GLenum type, GLuint id, GLenum seve
 	printf("---------------------opengl-callback-end--------------\n");
 }
 #endif
+
+
+//////////////////////// Convenience functions //////////////////////////////
+
+bool Window::CalledOnMainThread()
+{
+	if (g_oMainThread == std::this_thread::get_id())	// if called on the main thread
+		return true;									// return true.
+
+	return false;										// else return false.
+}
+
+
+bool Window::CalledOnBoundThread()
+{
+	if ( m_oBoundThread == std::thread::id()			// if not bound or
+		|| m_oBoundThread == std::this_thread::get_id())// bound to the calling thread
+	{
+		return true;									// then return true.
+	}
+
+	return false;										// else return false.
+}
