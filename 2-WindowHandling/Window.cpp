@@ -151,6 +151,10 @@ Window::Window(Window&& a_rOther)
 	m_iID = a_rOther.m_iID;
 	m_szTitle = a_rOther.m_szTitle;
 
+	// we need to make sure we arew bound to setup the callbacks:
+	auto hPrevContext = Window::CurrentContext();
+	this->MakeCurrent();
+
 	// update our glfw callbacks and user pointer:
 	glfwSetWindowUserPointer(m_pWindow, static_cast<void*>(this));
 	SetupCallbacks();
@@ -168,6 +172,9 @@ Window::Window(Window&& a_rOther)
 	a_rOther.m_pWindow = nullptr;
 	a_rOther.m_pGLEWContext = nullptr;
 	a_rOther.m_iID = -1;
+
+	// re-set activew/bound context state for this thread:
+	MakeContextCurrent(hPrevContext);
 }
 
 
@@ -199,6 +206,10 @@ Window& Window::operator=(Window&& a_rOther)
 	m_iID = a_rOther.m_iID;
 	m_szTitle = a_rOther.m_szTitle;
 
+	// we need to make sure we arew bound to setup the callbacks:
+	auto hPrevContext = Window::CurrentContext();
+	this->MakeCurrent();
+
 	// update our glfw callbacks and user pointer:
 	glfwSetWindowUserPointer(m_pWindow, static_cast<void*>(this));
 	SetupCallbacks();
@@ -216,6 +227,9 @@ Window& Window::operator=(Window&& a_rOther)
 	a_rOther.m_pWindow = nullptr;
 	a_rOther.m_pGLEWContext = nullptr;
 	a_rOther.m_iID = -1;
+
+	// re-set activew/bound context state for this thread:
+	MakeContextCurrent(hPrevContext);
 
 	return *this;
 }
