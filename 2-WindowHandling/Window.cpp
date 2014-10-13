@@ -17,7 +17,6 @@ std::thread::id g_oMainThread = std::this_thread::get_id();
 // Setup Static Window class members:
 int Window::m_iWindowCounter = 0;			// the first window will have an ID of 0.
 std::vector<Window*> Window::m_aWindows;
-std::thread::id	Window::m_oMainThread;
 
 // declare our OpenGL callback function.
 #ifdef _DEBUG
@@ -67,7 +66,7 @@ Window::Window(int a_iWidth, int a_iHeight, const std::string& a_szTitle, GLFWmo
 		// just in case the user does the wrong thing...
 		// For detials of which GLFW functions can only occure on the main thread see: 
 		// http://www.glfw.org/docs/latest/group__window.html
-		throw NotCalledOnMainThreadException(std::this_thread::get_id(), m_oMainThread);
+		throw NotCalledOnMainThreadException(std::this_thread::get_id(), g_oMainThread);
 	}
 
 	// save current active context info so we can restore it later!
@@ -141,7 +140,7 @@ Window::Window(Window&& a_rOther)
 	// safty check, we can only call this on the Main Thread
 	// due to the fact that we call glfwSetWindowUserPointer()
 	if (CalledOnMainThread() == false)
-		throw NotCalledOnMainThreadException(std::this_thread::get_id(), m_oMainThread);
+		throw NotCalledOnMainThreadException(std::this_thread::get_id(), g_oMainThread);
 
 	// now copy data for the rvalue:
 	m_pWindow = a_rOther.m_pWindow;
@@ -183,7 +182,7 @@ Window& Window::operator=(Window&& a_rOther)
 	// safty check, we can only call this on the Main Thread
 	// due to the fact that we call glfwSetWindowUserPointer()
 	if (CalledOnMainThread() == false)
-		throw NotCalledOnMainThreadException(std::this_thread::get_id(), m_oMainThread);
+		throw NotCalledOnMainThreadException(std::this_thread::get_id(), g_oMainThread);
 
 	// first check to see if this (i.e. the left hand side/lvalue) 
 	// is valid:

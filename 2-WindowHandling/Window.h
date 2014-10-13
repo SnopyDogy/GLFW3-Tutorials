@@ -107,8 +107,6 @@ private:
 
 	static std::vector<Window*> m_aWindows;										///< Array of all active windows.
 
-	static std::thread::id	m_oMainThread;										///< The id of the programs "main" thread.
-
 	void SetGLFWWindowHints(WindowHints* a_pWindowHints);						///< Sets GLFW window hints.
 	void SetupCallbacks();														///< Sets up GLFW and OpenGL callbacks for the window.
 	void Destory();																///< Destorys the window completely, used in destructor and copy constructor (if neccesary)
